@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WhatsApp Messages Live</title>
+
+<!-- Google Visualization API -->
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+<style>
+:root{
+  --red-main:#b11226;
+  --red-dark:#7a0b1a;
+  --green:#22c55e;
+  --text:#374151;
+  --muted:#6b7280;
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,var(--red-main),var(--red-dark));
+  font-family:"Segoe UI", Arial, sans-serif;
+}
+.card{
+  background:#ffffff;
+  width:440px;
+  padding:38px 26px 34px;
+  border-radius:18px;
+  text-align:center;
+  box-shadow:0 16px 40px rgba(0,0,0,.25);
+  position:relative;
+}
+.live-badge{
+  position:absolute;
+  top:18px;
+  right:18px;
+  background:#dc2626;
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  padding:6px 10px;
+  border-radius:999px;
+  animation:blink 1.4s infinite;
+}
+@keyframes blink{50%{opacity:.4}}
+.icon-wrap{
+  width:68px;height:68px;margin:0 auto 18px;
+  border-radius:50%;background:#e7f7ee;
+  display:flex;align-items:center;justify-content:center;
+}
+.icon-wrap img{width:38px;height:38px;}
+.title{font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px;}
+.count{
+  font-size:60px;font-weight:800;color:var(--green);
+  transition:transform .25s ease;
+}
+.count.bump{transform:scale(1.08);}
+.subtitle{font-size:14px;color:var(--muted);}
+.footer{margin-top:26px;font-size:13px;color:#9ca3af;}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="live-badge">LIVE</div>
+
+  <div class="icon-wrap">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+  </div>
+
+  <div class="title">WhatsApp Messages Received</div>
+  <div class="count" id="total">0</div>
+  <div class="subtitle">Live audience engagement</div>
+  <div class="footer">© Republic Media Analytics Panel</div>
+</div>
+
+<script>
+
+console.log("wroking is dine");
+
+google.charts.load('current', { packages:['corechart'] });
+google.charts.setOnLoadCallback(startLiveCount);
+
+function startLiveCount() {
+  fetchFromSheet();
+  setInterval(fetchFromSheet, 3000);
+}
+console.log("work")
+function fetchFromSheet() {
+
+  const sheetId = "1ZxTW5b_Dqfxl8ORG8KAxLbeLwB3GTGZxCvLUIa8rn-M";
+
+  var url =
+    "https://docs.google.com/spreadsheets/d/1ZxTW5b_Dqfxl8ORG8KAxLbeLwB3GTGZxCvLUIa8rn-M/gviz/tq?sheet=Sheet1&range=A1&t=" + Date.now();
+
+  var query = new google.visualization.Query(url);
+  
+
+  query.send(function (response) {
+    if (response.isError()) {
+      console.error("Sheet error", response.getMessage());
+      return;
+    }
+
+    var data = response.getDataTable();
+    if (!data || data.getNumberOfRows() === 0) return;
+
+    var value = data.getValue(0, 0);
+    var el = document.getElementById("total");
+
+    if (value !== null && el.innerText !== value.toString()) {
+      el.innerText = value;
+      el.classList.add("bump");
+      setTimeout(() => el.classList.remove("bump"), 200);
+    }
+  });
+}
+</script>
+
+
+
+</body>
+</html>
